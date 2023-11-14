@@ -1,0 +1,38 @@
+name: CMake
+
+on:
+  push:
+    branches: [ "master" ]
+  pull_request:
+    branches: [ "master" ]
+  
+jobs:
+  build:
+    # The CMake configure and build commands are platform agnostic and should work equally well on Windows or Mac.
+    # You can convert this to a matrix build if you need cross-platform coverage.
+    # See: https://docs.github.com/en/free-pro-team@latest/actions/learn-github-actions/managing-complex-workflows#using-a-build-matrix
+    runs-on: macos-latest
+
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Setup vcpkg
+      working-directory: /
+      run: |
+        git clone https://github.com/microsoft/vcpkg.git
+        cd vcpkg
+        bootstrap-vcpkg.bat
+        ./vcpkg integrate install
+
+    - name: Cache vcpkg packages
+      uses: actions/cache@v3
+      with:
+        path: ${{github.workspace}}/vcpkg_installed
+        key: ${{ runner.os }}-vcpkg-${{ hashFiles('${{github.workspace}}/vcpkg.json') }}
+        restore-keys: |
+          ${{ runner.os }}-vcpkg-${{ hashFiles('${{github.workspace}}/vcpkg.json') }}
+          ${{ runner.os }}-vcpkg-
+
+    - name: vcpkg_install
+      run: |
+        /vcpkg/vcpkg install --triplet arm64-osx
