@@ -17,7 +17,7 @@ jobs:
     - uses: actions/checkout@v3
     
     - name: Setup vcpkg
-      working-directory: /
+      working-directory: ${{github.workspace}}
       run: |
         git clone https://github.com/microsoft/vcpkg.git
         cd vcpkg
@@ -35,4 +35,4 @@ jobs:
 
     - name: vcpkg_install
       run: |
-        /vcpkg/vcpkg install --triplet arm64-osx
+        ${{github.workspace}}/vcpkg/vcpkg install --triplet arm64-osx
